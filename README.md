@@ -6,9 +6,9 @@
 
 <p align="center">
   <a href="#overview">Overview</a> •
-  <a href="#key-capabilities">Key Capabilities</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#system-architecture">Architecture</a> •
+  <a href="#key-capabilities">Key Capabilities</a> •
   <a href="#interaction-pipeline">Interaction Pipeline</a> •
   <a href="#mathematical-foundation">Mathematical Foundation</a> •
   <a href="#project-structure">Project Structure</a> •
@@ -30,25 +30,6 @@ Principal Component Analysis (PCA) is one of the most foundational concepts in d
 Instead of viewing static charts, a presenter stands in front of a standard webcam and reaches directly into a floating 3D Gaussian point cloud. Using natural physical hand gestures, the presenter can orbit around the distribution like a tangible sphere, inspect the emerging orthogonal eigenvector basis, and physically press down on the axis of smallest variance. As the presenter pushes their hand toward the camera, 3D points physically travel along continuous mathematical trajectories toward an optimal 2D projection subspace, flattening the data distribution into a razor-thin slice in real time.
 
 The engine enforces strict mathematical truth over decorative effects: every point coordinate, arrow length, bounding plane, and projection path represents an exact closed-form linear algebra computation executed live on your machine.
-
----
-
-## Key Capabilities
-
-### Physical Hand Tracking & Isolated Chirality
-Powered by Google's MediaPipe Tasks API v1.0.1 running on a dedicated background thread. The engine applies an aspect-ratio padding transform that maps widescreen camera frames into a 256x256 square neural network tensor, permanently eliminating internal C++ ROI-tracking segmentation faults. Tracking is explicitly locked to the presenter's physical right hand through selfie-mirror chirality inversion, completely ignoring background bystanders.
-
-### Ratchet & Clutching Mechanism
-Rotating a 3D object on a screen using continuous hand motion inevitably causes backward rotation when the hand resets. The engine features a mathematical clutching mechanism based on the 2D cross-product of the metacarpal hand bones. Rotation only engages when the back of the presenter's hand faces the camera. Flipping the hand to face the palm toward the camera instantly disengages the clutch, allowing the presenter to reposition their arm freely—functioning exactly like a mechanical ratchet wrench.
-
-### Continuous Velocity-Driven Projection
-Dimensionality compression is not a pre-rendered or time-based animation. It is parameterized as a continuous state variable $c \in [0, 1]$ driven strictly by hand velocity along the smallest principal axis. If the presenter freezes their hand, the transformation halts at that exact mathematical coordinate. If the hand reverses, projection reverses. Built-in magnetic extreme springs gently draw the state to $c = 0.0$ or $c = 1.0$ when the hand stops moving, ensuring clean tangent alignments.
-
-### Hardware-Accelerated Spatial Rendering
-The 3D environment is rendered via Panda3D using hardware point sprites with spherical falloff textures. Point positions are streamed directly into pre-allocated GPU vertex array buffers with zero heap allocation per frame. Dual directional key and fill lights are attached directly to the virtual camera node, ensuring the face of the point cloud remains vibrantly illuminated regardless of orbital perspective.
-
-### Precision Depth Slicing
-Cross-sectional visualization requires semi-transparent planes to interact correctly with solid points. Using Panda3D fixed render bins (Bin 10 for points, Bin 30 for the plane) combined with selective depth writes, points on the near side of the plane properly occlude it, points on the far side remain visible through the glass, and intersecting points create an exact planar cross-section.
 
 ---
 
@@ -150,6 +131,25 @@ graph LR
 4. **Thread 2 (Bottom Parallel Track — Math Engine):** Computes empirical covariance, performs symmetric eigendecomposition via `np.linalg.eigh`, enforces deterministic sign conventions, and evaluates continuous point positions along projection trajectories.
 5. **Scene Graph Convergence:** Both parallel streams converge at the scene graph. Point cloud GPU vertex buffers, eigenvector arrows, wireframe bounding box, and projection planes are synchronized in hardware.
 6. **Dual Live Display:** The final rendered scene displays in the Panda3D window at a locked 60 FPS, while a synchronized secondary OpenCV window displays tracking confidence, skeleton connections, and mode badges.
+
+---
+
+## Key Capabilities
+
+### Physical Hand Tracking & Isolated Chirality
+Powered by Google's MediaPipe Tasks API v1.0.1 running on a dedicated background thread. The engine applies an aspect-ratio padding transform that maps widescreen camera frames into a 256x256 square neural network tensor, permanently eliminating internal C++ ROI-tracking segmentation faults. Tracking is explicitly locked to the presenter's physical right hand through selfie-mirror chirality inversion, completely ignoring background bystanders.
+
+### Ratchet & Clutching Mechanism
+Rotating a 3D object on a screen using continuous hand motion inevitably causes backward rotation when the hand resets. The engine features a mathematical clutching mechanism based on the 2D cross-product of the metacarpal hand bones. Rotation only engages when the back of the presenter's hand faces the camera. Flipping the hand to face the palm toward the camera instantly disengages the clutch, allowing the presenter to reposition their arm freely—functioning exactly like a mechanical ratchet wrench.
+
+### Continuous Velocity-Driven Projection
+Dimensionality compression is not a pre-rendered or time-based animation. It is parameterized as a continuous state variable $c \in [0, 1]$ driven strictly by hand velocity along the smallest principal axis. If the presenter freezes their hand, the transformation halts at that exact mathematical coordinate. If the hand reverses, projection reverses. Built-in magnetic extreme springs gently draw the state to $c = 0.0$ or $c = 1.0$ when the hand stops moving, ensuring clean tangent alignments.
+
+### Hardware-Accelerated Spatial Rendering
+The 3D environment is rendered via Panda3D using hardware point sprites with spherical falloff textures. Point positions are streamed directly into pre-allocated GPU vertex array buffers with zero heap allocation per frame. Dual directional key and fill lights are attached directly to the virtual camera node, ensuring the face of the point cloud remains vibrantly illuminated regardless of orbital perspective.
+
+### Precision Depth Slicing
+Cross-sectional visualization requires semi-transparent planes to interact correctly with solid points. Using Panda3D fixed render bins (Bin 10 for points, Bin 30 for the plane) combined with selective depth writes, points on the near side of the plane properly occlude it, points on the far side remain visible through the glass, and intersecting points create an exact planar cross-section.
 
 ---
 
