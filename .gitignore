@@ -1,0 +1,31 @@
+# Internal project planning and historical archives
+docs/internal/
+
+# Python & Environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Models & Large binary assets (downloaded dynamically on first run by hand_tracker.py)
+models/*.task
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Test outputs & Scratch
+test_output.txt
+scratch/
