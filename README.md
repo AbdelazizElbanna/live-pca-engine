@@ -64,29 +64,38 @@ The engine enforces strict mathematical truth over decorative effects: every poi
 The Live PCA Engine is designed around a multi-threaded, asynchronous dual-loop model that decouples slow camera I/O and neural network inference from high-frequency 3D scene rendering:
 
 ```mermaid
-graph LR
-    subgraph Thread1 ["Thread 1: Asynchronous Input Pipeline"]
-        A["Webcam Capture<br/>720p @ 30 FPS"] --> B["MediaPipe Hand Tracking<br/>256x256 Square ROI"]
-        B --> C["Landmark Smoother<br/>EMA Filter (alpha=0.3)"]
-        C --> D["Input Snapshot<br/>Thread-Safe Bridge"]
+flowchart LR
+    subgraph Thread1["Thread 1: Asynchronous Input Pipeline"]
+        direction TB
+        A["Webcam Capture<br/>720p @ 30 FPS"]
+        B["MediaPipe Hand Tracking<br/>256x256 Square ROI"]
+        C["Landmark Smoother<br/>EMA Filter alpha=0.3"]
+        D["Input Snapshot<br/>Thread-Safe Bridge"]
+        A --> B --> C --> D
     end
 
-    subgraph Thread2 ["Thread 2: Main Engine Loop (Panda3D)"]
-        D --> E["Gesture Intent Gating<br/>Ratchet / Clutch Check"]
-        D --> F["Math Core Engine<br/>Covariance & eigh"]
-        
-        E --> G["State & Physics Manager<br/>Trackball + SVD Ortho"]
-        F --> H["Continuous Projection Math<br/>p_i(c) Homotopy & Extents"]
-        
-        G --> I["Scene Graph Assembly<br/>GPU Sprites + Depth Bins"]
-        H --> I
+    subgraph Thread2["Thread 2: Main Engine Loop Panda3D"]
+        direction TB
+        E["Gesture Intent Gating<br/>Ratchet / Clutch Check"]
+        F["Math Core Engine<br/>Covariance & eigh"]
+        G["State & Physics Manager<br/>Trackball + SVD Ortho"]
+        H["Continuous Projection Math<br/>Homotopy & Extents"]
+        I["Scene Graph Assembly<br/>GPU Sprites + Depth Bins"]
+        E --> G --> I
+        F --> H --> I
     end
 
-    subgraph Outputs ["Dual Live Viewports"]
-        I --> J["3D Spatial Viewport<br/>Panda3D (Locked 60 FPS)"]
-        B -.-> K["Hand Tracking HUD<br/>OpenCV Overlay Window"]
-        G -.-> K
+    subgraph Outputs["Dual Live Viewports"]
+        direction TB
+        J["3D Spatial Viewport<br/>Panda3D Locked 60 FPS"]
+        K["Hand Tracking HUD<br/>OpenCV Overlay Window"]
     end
+
+    D --> E
+    D --> F
+    I --> J
+    B -.-> K
+    G -.-> K
 
     style A fill:#12131C,stroke:#38BDF8,stroke-width:2px,color:#fff
     style B fill:#12131C,stroke:#A855F7,stroke-width:2px,color:#fff
